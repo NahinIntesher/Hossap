@@ -5,7 +5,7 @@ import "../global.css"; // Ensure your Tailwind setup works correctly here
 
 const MainLayout = () => {
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-transparent">
       <Slot />
     </SafeAreaView>
   );
