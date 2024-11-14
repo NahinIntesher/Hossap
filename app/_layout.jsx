@@ -20,7 +20,7 @@ const MainLayout = () => {
       // User is not authenticated
       router.replace("logIn");
     }
-  }, [isAuthenticated, segments, router]);
+  }, [isAuthenticated]);
 
   return <Slot />;
 };

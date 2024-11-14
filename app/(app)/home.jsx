@@ -12,10 +12,8 @@ import { useAuth } from "../../context/authContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function ChatApp() {
+export default function Home() {
   const { logout, user } = useAuth();
-  const [messages, setMessages] = useState([]);
-  const [messageText, setMessageText] = useState("");
 
   const handleLogout = async () => {
     try {
@@ -33,30 +31,12 @@ export default function ChatApp() {
         <View style={styles.header}>
           <View>
             <Text style={styles.headerSubtitle}>Welcome</Text>
-            <Text style={styles.headerTitle}>{user.name}</Text>
+            <Text style={styles.headerTitle}>{user?.name}</Text>
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Ionicons name="log-out-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
-
-        {/* Messages List */}
-        <FlatList
-          data={messages}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              style={
-                item.sender === "You"
-                  ? styles.messageBubbleSent
-                  : styles.messageBubbleReceived
-              }
-            >
-              <Text style={styles.messageText}>{item.text}</Text>
-            </View>
-          )}
-          style={styles.messagesContainer}
-        />
       </LinearGradient>
     </SafeAreaView>
   );
@@ -73,7 +53,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 30,
     paddingVertical: 15,
-    backgroundColor: "#64ffa5",
+    backgroundColor: "#00ff51",
   },
   headerTitle: {
     color: "black",
@@ -86,7 +66,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   logoutButton: {
-    backgroundColor: "#8300d4",
+    backgroundColor: "#ff1e00",
     padding: 10,
     borderRadius: 15,
   },

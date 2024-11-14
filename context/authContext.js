@@ -21,11 +21,12 @@ export const AuthContextProvider = ({ children }) => {
         setIsAuthenticated(true);
         const userDoc = await getDoc(doc(db, "users", user.uid)); // Fetch user data from Firestore
         if (userDoc.exists()) {
+          const userData = userDoc.data();
           setUser({
             uid: user.uid,
             email: user.email,
-            name: userDoc.data().name,
-            profileUrl: userDoc.data().profileUrl,
+            name: userData?.name || "Default Name", // Default name if name is not found
+            profileUrl: userData?.profileUrl || "", // Default empty string if profileUrl doesn't exist
           });
         } else {
           setUser({
