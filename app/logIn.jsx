@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import {
   widthPercentageToDP as wp,
@@ -18,10 +18,13 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import Loading from "@/components/Loading";
 
 export default function LogIn() {
-  const [email, onChangeEmail] = React.useState("");
-  const [password, onChangePassword] = React.useState("");
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
+  const [loading, setLoading] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
 
@@ -84,11 +87,12 @@ export default function LogIn() {
   };
 
   // Handle login
-  const handleLogin = () => {
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
+  const handleLogin = async () => {
+    const isEmailValid = validateEmail(emailRef.current);
+    const isPasswordValid = validatePassword(passwordRef.current);
 
     if (isEmailValid && isPasswordValid) {
+      setLoading(true);
       // Proceed with login
       Alert.alert("Success", "Login successful!");
     }
@@ -132,11 +136,10 @@ export default function LogIn() {
                 <TextInput
                   style={{ fontSize: hp(2) }}
                   className="flex-1 font-semibold text-neutral-700"
-                  onChangeText={(text) => {
-                    onChangeEmail(text);
-                    validateEmail(text);
+                  onChangeText={(value) => {
+                    emailRef.current = value;
+                    validateEmail(emailRef.current);
                   }}
-                  value={email}
                   keyboardType="email-address"
                   placeholder="Enter your email"
                   placeholderTextColor={"gray"}
@@ -162,11 +165,10 @@ export default function LogIn() {
                 <TextInput
                   style={{ fontSize: hp(2) }}
                   className="flex-1 font-semibold text-neutral-700"
-                  onChangeText={(text) => {
-                    onChangePassword(text);
-                    validatePassword(text);
+                  onChangeText={(value) => {
+                    passwordRef.current = value;
+                    validatePassword(passwordRef.current);
                   }}
-                  value={password}
                   placeholder="••••••••••••••"
                   secureTextEntry={!showPassword}
                   placeholderTextColor={"gray"}
@@ -189,16 +191,20 @@ export default function LogIn() {
 
               {/* Login Button */}
               <View className="flex flex-col items-center">
-                <TouchableOpacity
-                  className="w-full bg-[#6c63ff] items-center mt-4 rounded-lg py-5"
-                  onPress={handleLogin}
-                >
-                  <Text className="text-white text-xl font-bold">Login</Text>
-                </TouchableOpacity>
+                {loading ? (
+                  <Loading size={hp(15)} />
+                ) : (
+                  <TouchableOpacity
+                    className="w-full bg-[#6c63ff] items-center mt-4 rounded-lg py-5"
+                    onPress={handleLogin}
+                  >
+                    <Text className="text-white text-xl font-bold">Login</Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Sign Up Link */}
-              <View className="flex flex-row justify-center mt-4">
+              <View className="flex flex-row justify-center mt-2">
                 <Text className="text-md">Don't have an account? </Text>
                 <Link href={"/signUp"}>
                   <Text

@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { useState } from "react";
 import {
   widthPercentageToDP as wp,
@@ -18,14 +18,15 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import Loading from "@/components/Loading";
 
 export default function SignUp() {
-  const [name, onChangeName] = React.useState("");
-  const [email, onChangeEmail] = React.useState("");
-  const [password, onChangePassword] = React.useState("");
+  const nameRef = useRef("");
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
   const [showPassword, setShowPassword] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
-
+  const [loading, setLoading] = useState(false);
   // Add error states
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
@@ -86,10 +87,11 @@ export default function SignUp() {
 
   // Handle sign up
   const handleSignUp = () => {
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
+    const isEmailValid = validateEmail(emailRef.current);
+    const isPasswordValid = validatePassword(passwordRef.current);
 
     if (isEmailValid && isPasswordValid) {
+      setLoading(true);
       // Proceed with sign up
       Alert.alert("Success", "Sign up successful!");
     }
@@ -101,13 +103,13 @@ export default function SignUp() {
         <StatusBar style="auto" />
         <View
           style={{ paddingTop: hp(8), paddingHorizontal: wp(7) }}
-          className="flex-1 gap-1"
+          className="flex-1"
         >
           {/* Signup Image */}
           {!isInputFocused && (
             <View className="items-center">
               <Image
-                style={{ height: hp(30) }}
+                style={{ height: hp(25) }}
                 resizeMode="contain"
                 source={require("../assets/images/signupImage.png")}
               />
@@ -131,8 +133,7 @@ export default function SignUp() {
                 <TextInput
                   style={{ fontSize: hp(2) }}
                   className="flex-1 font-semibold text-neutral-700"
-                  onChangeText={onChangeName}
-                  value={name}
+                  onChangeText={(value) => (nameRef.current = value)}
                   placeholder="Enter your name"
                   placeholderTextColor={"gray"}
                   onFocus={() => setIsInputFocused(true)}
@@ -152,11 +153,10 @@ export default function SignUp() {
                 <TextInput
                   style={{ fontSize: hp(2) }}
                   className="flex-1 font-semibold text-neutral-700"
-                  onChangeText={(text) => {
-                    onChangeEmail(text);
-                    validateEmail(text);
+                  onChangeText={(value) => {
+                    emailRef.current = value;
+                    validateEmail(emailRef.current);
                   }}
-                  value={email}
                   keyboardType="email-address"
                   placeholder="Enter your email"
                   placeholderTextColor={"gray"}
@@ -182,11 +182,10 @@ export default function SignUp() {
                 <TextInput
                   style={{ fontSize: hp(2) }}
                   className="flex-1 font-semibold text-neutral-700"
-                  onChangeText={(text) => {
-                    onChangePassword(text);
-                    validatePassword(text);
+                  onChangeText={(value) => {
+                    passwordRef.current = value;
+                    validatePassword(passwordRef.current);
                   }}
-                  value={password}
                   placeholder="••••••••••••••"
                   secureTextEntry={!showPassword}
                   placeholderTextColor={"gray"}
@@ -209,16 +208,22 @@ export default function SignUp() {
 
               {/* Sign Up Button */}
               <View className="flex flex-col items-center">
-                <TouchableOpacity
-                  className="w-full bg-[#6c63ff] items-center mt-4 rounded-lg py-5"
-                  onPress={handleSignUp}
-                >
-                  <Text className="text-white text-xl font-bold">Sign Up</Text>
-                </TouchableOpacity>
+                {loading ? (
+                  <Loading size={hp(13)} />
+                ) : (
+                  <TouchableOpacity
+                    className="w-full bg-[#6c63ff] items-center mt-4 rounded-lg py-5"
+                    onPress={handleSignUp}
+                  >
+                    <Text className="text-white text-xl font-bold">
+                      Sign Up
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
 
               {/* Login Link */}
-              <View className="flex flex-row justify-center mt-4">
+              <View className="flex flex-row justify-center mt-2">
                 <Text className="text-md">Already have an account? </Text>
                 <Link href={"/logIn"}>
                   <Text

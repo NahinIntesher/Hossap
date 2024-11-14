@@ -10,13 +10,13 @@ const MainLayout = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof isAuthenticatd == 'undefined') return;
-    const inApp = segments[0] === '(app)';
-      if(isAuthenticatd && !inApp){
-       router.replace('home');
-      } else if (isAuthenticatd == false ) {
-       router.replace('logIn');
-      }
+    if (typeof isAuthenticatd == "undefined") return;
+    const inApp = segments[0] === "(app)";
+    if (isAuthenticatd && !inApp) {
+      router.replace("/(app)/home");
+    } else if (isAuthenticatd == false) {
+      router.replace("/logIn");
+    }
   }, [isAuthenticatd]);
 
   return <Slot />;
