@@ -1,16 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Slot } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import "../global.css"; // Ensure your Tailwind setup works correctly here
+import { AuthContextProvider, useAuth } from "../context/authContext";
 
 const MainLayout = () => {
-  return (
-    <SafeAreaView className="flex-1 bg-transparent">
-      <Slot />
-    </SafeAreaView>
-  );
+  const { isAuthenticatd } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof isAuthenticatd == 'undefined') return;
+    const inApp = segments[0] === '(app)';
+      if(isAuthenticatd && !inApp){
+       router.replace('home');
+      } else if (isAuthenticatd == false ) {
+       router.replace('logIn');
+      }
+  }, [isAuthenticatd]);
+
+  return <Slot />;
 };
 
 export default function Layout() {
-  return <MainLayout />;
+  return (
+    <AuthContextProvider>
+      <MainLayout />;
+    </AuthContextProvider>
+  );
 }
