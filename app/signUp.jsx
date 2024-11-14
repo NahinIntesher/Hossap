@@ -19,11 +19,15 @@ import { StatusBar } from "expo-status-bar";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import Loading from "@/components/Loading";
+import { useAuth } from "@/context/authContext";
 
 export default function SignUp() {
   const nameRef = useRef("");
   const emailRef = useRef("");
   const passwordRef = useRef("");
+  const profileRef = useRef("");
+
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -86,14 +90,29 @@ export default function SignUp() {
   };
 
   // Handle sign up
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+    if (!emailRef.current || !passwordRef.current || !nameRef.current) {
+      Alert.alert("SignUp Error", "Fill all the fields");
+      return;
+    }
+
     const isEmailValid = validateEmail(emailRef.current);
     const isPasswordValid = validatePassword(passwordRef.current);
 
     if (isEmailValid && isPasswordValid) {
       setLoading(true);
-      // Proceed with sign up
-      Alert.alert("Success", "Sign up successful!");
+      let response = await register(
+        nameRef.current,
+        emailRef.current,
+        passwordRef.current,
+        profileRef.current
+      );
+      setLoading(false);
+
+      console.log("Got Result: " + response);
+      if (!response.success) {
+        Alert.alert("SignUp Failed", response.message);
+      }
     }
   };
 

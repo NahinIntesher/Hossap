@@ -19,11 +19,13 @@ import { StatusBar } from "expo-status-bar";
 import { Octicons, Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import Loading from "@/components/Loading";
+import { useAuth } from "../context/authContext"; // Import the useAuth hook
 
 export default function LogIn() {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -88,13 +90,36 @@ export default function LogIn() {
 
   // Handle login
   const handleLogin = async () => {
+    if (!emailRef.current || !passwordRef.current) {
+      Alert.alert("Login Error", "Please fill all the fields");
+      return;
+    }
+
     const isEmailValid = validateEmail(emailRef.current);
     const isPasswordValid = validatePassword(passwordRef.current);
 
     if (isEmailValid && isPasswordValid) {
       setLoading(true);
-      // Proceed with login
-      Alert.alert("Success", "Login successful!");
+      try {
+        let response = await login(emailRef.current, passwordRef.current);
+        setLoading(false);
+
+        if (!response.success) {
+          Alert.alert(
+            "Login Failed",
+            response.message || "An error occurred during login."
+          );
+        }
+      } catch (error) {
+        setLoading(false);
+        console.error("Login error: ", error);
+        Alert.alert(
+          "Login Error",
+          "An unexpected error occurred. Please try again."
+        );
+      }
+    } else {
+      Alert.alert("Validation Error", "Invalid email or password format.");
     }
   };
 

@@ -6,17 +6,33 @@ import {
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useRouter } from "expo-router"; // Import useRouter
+
 export const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(undefined);
+  const router = useRouter(); // Initialize router
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAuthenticated(true);
-        setUser(user);
+        const userDoc = await getDoc(doc(db, "users", user.uid)); // Fetch user data from Firestore
+        if (userDoc.exists()) {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            name: userDoc.data().name,
+            profileUrl: userDoc.data().profileUrl,
+          });
+        } else {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+          });
+        }
       } else {
         setIsAuthenticated(false);
         setUser(null);
@@ -26,22 +42,32 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    // Implement the login functionality here
     try {
+      const response = await signInWithEmailAndPassword(auth, email, password);
+      setUser(response.user);
+      setIsAuthenticated(true);
+      return { success: true, user: response?.user };
     } catch (error) {
-      console.log(error);
+      let msg = error.message;
+      if (msg.includes("(auth/invalid-email)")) {
+        msg = "Invalid Email";
+      }
+      return { success: false, message: msg };
     }
   };
+
   const logout = async () => {
-    // Implement the logout functionality here
     try {
+      await auth.signOut();
+      setUser(null);
+      setIsAuthenticated(false);
     } catch (error) {
       console.log(error);
     }
   };
-  const register = async (name, email, password) => {
+
+  const register = async (name, email, password, profileUrl) => {
     try {
-      // Implement the registration functionality here
       const response = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -51,12 +77,20 @@ export const AuthContextProvider = ({ children }) => {
 
       await setDoc(doc(db, "users", response?.user?.uid), {
         name,
-        profileUrl: "",
+        profileUrl,
         userId: response?.user?.uid,
       });
+
+      setUser(response.user);
+      setIsAuthenticated(true);
+
       return { success: true, user: response?.user };
     } catch (error) {
-      return { success: false, message: error.message };
+      let msg = error.message;
+      if (msg.includes("(auth/invalid-email)")) {
+        msg = "Invalid Email";
+      }
+      return { success: false, message: msg };
     }
   };
 

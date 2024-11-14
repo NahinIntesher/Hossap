@@ -5,19 +5,22 @@ import "../global.css"; // Ensure your Tailwind setup works correctly here
 import { AuthContextProvider, useAuth } from "../context/authContext";
 
 const MainLayout = () => {
-  const { isAuthenticatd } = useAuth();
+  const { isAuthenticated } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof isAuthenticatd == "undefined") return;
+    if (typeof isAuthenticated === "undefined") return;
+
     const inApp = segments[0] === "(app)";
-    if (isAuthenticatd && !inApp) {
-      router.replace("/(app)/home");
-    } else if (isAuthenticatd == false) {
-      router.replace("/logIn");
+    if (isAuthenticated && !inApp) {
+      // User is authenticated but not in the main app section
+      router.replace("home");
+    } else if (isAuthenticated === false) {
+      // User is not authenticated
+      router.replace("logIn");
     }
-  }, [isAuthenticatd]);
+  }, [isAuthenticated, segments, router]);
 
   return <Slot />;
 };
@@ -25,7 +28,7 @@ const MainLayout = () => {
 export default function Layout() {
   return (
     <AuthContextProvider>
-      <MainLayout />;
+      <MainLayout />
     </AuthContextProvider>
   );
 }
