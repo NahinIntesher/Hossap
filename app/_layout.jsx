@@ -7,20 +7,7 @@ import { BackHandler } from "react-native";
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
-  const segments = useSegments();
-  const router = useRouter();
   const pathname = usePathname();
-
-  useEffect(() => {
-    if (typeof isAuthenticated === "undefined") return;
-    const inApp = segments[0] === "(app)"; // Check if current path is part of the app
-
-    if (isAuthenticated && !inApp) {
-      router.push("/home"); // Redirect to home if authenticated
-    } else if (isAuthenticated === false) {
-      router.push("/logIn"); // Redirect to login if not authenticated
-    } 
-  }, [isAuthenticated]);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
