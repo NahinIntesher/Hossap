@@ -1,21 +1,33 @@
-import { Link } from "expo-router";
+import { Link, usePathname, useSegments } from "expo-router";
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/context/authContext";
 
 export default function Onboarding() {
   const [isFirstTime, setIsFirstTime] = useState(null);
   const [isLoaded, setLoaded] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const segments = useSegments();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const checkFirstTime = async () => {
       try {
-        const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding");
+        const hasSeenOnboarding = await AsyncStorage.getItem(
+          "hasSeenOnboarding"
+        );
         if (hasSeenOnboarding) {
           setIsFirstTime(false);
-          router.push("/logIn"); // Redirect to login if onboarding already seen
+          if (typeof isAuthenticated === "undefined") return;
+          const inApp = segments[0] === "(app)";
+          if (isAuthenticated && !inApp) {
+            router.push("/home"); // Redirect to home if authenticated
+          } else if (isAuthenticated === false) {
+            router.push("/logIn"); // Redirect to login if not authenticated
+          }
         } else {
           setIsFirstTime(true);
           setLoaded(true); // Render the onboarding screen
@@ -54,7 +66,8 @@ export default function Onboarding() {
           Welcome to Hossap
         </Text>
         <Text className="text-lg text-black text-center mb-8">
-          Stay connected with friends and family, chat anytime, anywhere. Let's get started!
+          Stay connected with friends and family, chat anytime, anywhere. Let's
+          get started!
         </Text>
         <TouchableOpacity
           className="bg-[#6c63ff] py-4 px-8 rounded-full"

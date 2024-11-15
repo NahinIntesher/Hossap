@@ -17,9 +17,9 @@ const MainLayout = () => {
 
     if (isAuthenticated && !inApp) {
       router.push("/home"); // Redirect to home if authenticated
-    } else if (isAuthenticated === false && inApp) {
+    } else if (isAuthenticated === false) {
       router.push("/logIn"); // Redirect to login if not authenticated
-    }
+    } 
   }, [isAuthenticated]);
 
   useEffect(() => {

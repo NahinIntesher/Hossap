@@ -7,6 +7,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebaseConfig";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "expo-router"; // Import useRouter
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
 export const AuthContext = createContext();
 
@@ -16,6 +17,23 @@ export const AuthContextProvider = ({ children }) => {
   const router = useRouter(); // Initialize router
 
   useEffect(() => {
+    const checkAuthState = async () => {
+      try {
+        const storedAuthState = await AsyncStorage.getItem("isAuthenticated");
+        if (storedAuthState === "true") {
+          // User was previously authenticated
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Error checking auth state:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuthState(); // Check auth state on app start
+
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAuthenticated(true);
@@ -39,6 +57,7 @@ export const AuthContextProvider = ({ children }) => {
         setUser(null);
       }
     });
+
     return unsub;
   }, []);
 
@@ -47,6 +66,13 @@ export const AuthContextProvider = ({ children }) => {
       const response = await signInWithEmailAndPassword(auth, email, password);
       setUser(response.user);
       setIsAuthenticated(true);
+
+      // Persist authentication state in AsyncStorage
+      await AsyncStorage.setItem("isAuthenticated", "true");
+
+      // After login, redirect to Home
+      router.push("/home");
+
       return { success: true, user: response?.user };
     } catch (error) {
       let msg = error.message;
@@ -66,6 +92,12 @@ export const AuthContextProvider = ({ children }) => {
       await auth.signOut();
       setUser(null);
       setIsAuthenticated(false);
+
+      // Remove authentication state from AsyncStorage
+      await AsyncStorage.removeItem("isAuthenticated");
+
+      // After logout, redirect to Login
+      router.push("/logIn");
     } catch (error) {
       console.log(error);
     }
@@ -88,6 +120,12 @@ export const AuthContextProvider = ({ children }) => {
 
       setUser(response.user);
       setIsAuthenticated(true);
+
+      // Persist authentication state
+      await AsyncStorage.setItem("isAuthenticated", "true");
+
+      // Redirect to Home after registration
+      router.push("/home");
 
       return { success: true, user: response?.user };
     } catch (error) {
