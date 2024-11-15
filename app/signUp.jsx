@@ -128,14 +128,16 @@ export default function SignUp() {
           {!isInputFocused && (
             <View className="items-center">
               <Image
-                style={{ height: hp(25) }}
+                style={{ height: hp(20) }}
                 resizeMode="contain"
                 source={require("../assets/images/signupImage.png")}
               />
             </View>
           )}
           <View className="mb-2">
-            <Text className="text-3xl text-center">Create Account</Text>
+            <Text className="text-3xl text-center font-bold">
+              Create Account
+            </Text>
             <Text className="text-md text-center">Sign up to get started</Text>
           </View>
 
@@ -228,10 +230,10 @@ export default function SignUp() {
               {/* Sign Up Button */}
               <View className="flex flex-col items-center">
                 {loading ? (
-                  <Loading size={hp(13)} />
+                  <Loading size={hp(8)} />
                 ) : (
                   <TouchableOpacity
-                    className="w-full bg-[#6c63ff] items-center mt-4 rounded-lg py-5"
+                    className="w-full bg-[#a023ff] items-center mt-4 rounded-lg py-5"
                     onPress={handleSignUp}
                   >
                     <Text className="text-white text-xl font-bold">
@@ -242,11 +244,11 @@ export default function SignUp() {
               </View>
 
               {/* Login Link */}
-              <View className="flex flex-row justify-center mt-2">
+              <View className="flex flex-row justify-center mt-4">
                 <Text className="text-md">Already have an account? </Text>
                 <Link href={"/logIn"}>
                   <Text
-                    style={{ color: "#6c63ff" }}
+                    style={{ color: "#a023ff" }}
                     className="text-md font-bold"
                   >
                     Login

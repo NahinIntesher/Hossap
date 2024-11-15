@@ -6,8 +6,8 @@ export default function Loading({ size }) {
   return (
     <View style={{ height: size, aspectRatio: 1 }}>
       <LottieView
-        style={{ flex: 1 }}
-        source={require("../assets/animations/loader.json")}
+        style={{ flex: 1, marginTop: 20}}
+        source={require("../assets/animations/loading.json")}
         autoPlay
         loop
       />

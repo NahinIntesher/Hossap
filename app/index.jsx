@@ -24,9 +24,9 @@ export default function Onboarding() {
           if (typeof isAuthenticated === "undefined") return;
           const inApp = segments[0] === "(app)";
           if (isAuthenticated && !inApp) {
-            router.replace("/home"); // Redirect to home if authenticated
+            router.replace("home"); // Redirect to home if authenticated
           } else if (isAuthenticated === false) {
-            router.replace("/logIn"); // Redirect to login if not authenticated
+            router.replace("logIn"); // Redirect to login if not authenticated
           }
         } else {
           setIsFirstTime(true);
@@ -43,7 +43,7 @@ export default function Onboarding() {
     try {
       await AsyncStorage.setItem("hasSeenOnboarding", "true");
       setIsFirstTime(false);
-      router.replace("/signUp"); // Navigate to sign-up after onboarding
+      router.replace("logIn"); // Navigate to sign-up after onboarding
     } catch (error) {
       console.error("Error setting onboarding status:", error);
     }
@@ -70,7 +70,7 @@ export default function Onboarding() {
           get started!
         </Text>
         <TouchableOpacity
-          className="bg-[#6c63ff] py-4 px-8 rounded-full"
+          className="bg-[#a023ff] py-4 px-8 rounded-full"
           onPress={handleContinue}
         >
           <Text className="text-white text-lg font-bold">Get Started</Text>

@@ -125,7 +125,7 @@ export const AuthContextProvider = ({ children }) => {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
       // Redirect to Home after registration
-      router.push("/home");
+      router.replace("logIn");
 
       return { success: true, user: response?.user };
     } catch (error) {
@@ -136,6 +136,8 @@ export const AuthContextProvider = ({ children }) => {
         msg = "Invalid Password";
       } else if (msg.includes("(auth/invalid-credential)")) {
         msg = "Invalid Email or Password";
+      } else if (msg.includes("(auth/email-already-in-use)")) {
+        msg = "Email already exists";
       }
       return { success: false, message: msg };
     }
