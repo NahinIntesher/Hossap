@@ -1,41 +1,49 @@
 import { Link } from "expo-router";
 import { Text, View, Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 
 export default function Onboarding() {
-  const [isFirstTime, setIsFirstTime] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState(null);
   const [isLoaded, setLoaded] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Check if the user has seen the onboarding screen before
     const checkFirstTime = async () => {
-      const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding");
-      if (hasSeenOnboarding) {
-        setIsFirstTime(false);
-        router.push("/logIn");
-      }
-      else {
-        setLoaded(true);
+      try {
+        const hasSeenOnboarding = await AsyncStorage.getItem("hasSeenOnboarding");
+        if (hasSeenOnboarding) {
+          setIsFirstTime(false);
+          router.push("/logIn"); // Redirect to login if onboarding already seen
+        } else {
+          setIsFirstTime(true);
+          setLoaded(true); // Render the onboarding screen
+        }
+      } catch (error) {
+        console.error("Error checking onboarding status:", error);
       }
     };
     checkFirstTime();
   }, []);
 
   const handleContinue = async () => {
-    // Set the flag so the user won't see the onboarding again
-    await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    setIsFirstTime(false);
-    router.push("/signUp");
+    try {
+      await AsyncStorage.setItem("hasSeenOnboarding", "true");
+      setIsFirstTime(false);
+      router.replace("/signUp"); // Navigate to sign-up after onboarding
+    } catch (error) {
+      console.error("Error setting onboarding status:", error);
+    }
   };
 
-  if(isLoaded) {
-    return (
+  if (isFirstTime === null) {
+    return null; // Optionally, a loading indicator can be placed here
+  }
 
-      <View className="flex-1 p-8 justify-center items-center ">
+  if (isFirstTime && isLoaded) {
+    return (
+      <View className="flex-1 p-8 justify-center items-center">
         <Image
           source={require("../assets/images/welcomeImage.png")}
           style={{ width: 250, height: 250 }}
@@ -46,24 +54,17 @@ export default function Onboarding() {
           Welcome to Hossap
         </Text>
         <Text className="text-lg text-black text-center mb-8">
-          Stay connected with friends and family, chat anytime, anywhere. Let's
-          get started!
+          Stay connected with friends and family, chat anytime, anywhere. Let's get started!
         </Text>
-  
         <TouchableOpacity
           className="bg-[#6c63ff] py-4 px-8 rounded-full"
           onPress={handleContinue}
         >
           <Text className="text-white text-lg font-bold">Get Started</Text>
         </TouchableOpacity>
-        <Link href="/logIn" className="mt-4">
-          <Text className="text-md">Already have an account? </Text>
-  
-          <Text style={{ color: "#6c63ff" }} className="text-md font-bold ">
-            Login
-          </Text>
-        </Link>
       </View>
     );
-  } 
+  }
+
+  return null; // Or a fallback/loading screen if necessary
 }

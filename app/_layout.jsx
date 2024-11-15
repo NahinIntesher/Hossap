@@ -1,26 +1,41 @@
 import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Slot, useRouter, useSegments } from "expo-router";
-import "../global.css"; // Ensure your Tailwind setup works correctly here
+import { Slot, useRouter, useSegments, usePathname } from "expo-router";
+import "../global.css";
 import { AuthContextProvider, useAuth } from "../context/authContext";
+import { BackHandler } from "react-native";
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (typeof isAuthenticated === "undefined") return;
+    const inApp = segments[0] === "(app)"; // Check if current path is part of the app
 
-    const inApp = segments[0] === "(app)";
     if (isAuthenticated && !inApp) {
-      // User is authenticated but not in the main app section
-      router.replace("home");
-    } else if (isAuthenticated === false) {
-      // User is not authenticated
-      router.replace("logIn");
+      router.push("/home"); // Redirect to home if authenticated
+    } else if (isAuthenticated === false && inApp) {
+      router.push("/logIn"); // Redirect to login if not authenticated
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        if (isAuthenticated && pathname === "/home") {
+          BackHandler.exitApp(); // Exit app from home screen
+          return true; // Prevents navigating back
+        }
+        return false; // Allow default behavior for other screens
+      }
+    );
+
+    return () => backHandler.remove(); // Cleanup on unmount
+  }, [isAuthenticated, pathname]);
 
   return <Slot />;
 };

@@ -52,6 +52,10 @@ export const AuthContextProvider = ({ children }) => {
       let msg = error.message;
       if (msg.includes("(auth/invalid-email)")) {
         msg = "Invalid Email";
+      } else if (msg.includes("(auth/invalid-password)")) {
+        msg = "Invalid Password";
+      } else if (msg.includes("(auth/invalid-credential)")) {
+        msg = "Invalid Email or Password";
       }
       return { success: false, message: msg };
     }
@@ -90,6 +94,10 @@ export const AuthContextProvider = ({ children }) => {
       let msg = error.message;
       if (msg.includes("(auth/invalid-email)")) {
         msg = "Invalid Email";
+      } else if (msg.includes("(auth/invalid-password)")) {
+        msg = "Invalid Password";
+      } else if (msg.includes("(auth/invalid-credential)")) {
+        msg = "Invalid Email or Password";
       }
       return { success: false, message: msg };
     }

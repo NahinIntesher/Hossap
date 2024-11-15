@@ -6,7 +6,7 @@ import {
   FlatList,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../context/authContext";
 import { LinearGradient } from "expo-linear-gradient";
@@ -27,11 +27,10 @@ export default function Home() {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={["#f5f7fa", "#c3cfe2"]} style={styles.container}>
-        {/* Header */}
         <View style={styles.header}>
           <View>
             <Text style={styles.headerSubtitle}>Welcome</Text>
-            <Text style={styles.headerTitle}>{user?.name}</Text>
+            <Text style={styles.headerTitle}>{user?.name || "User"}</Text>
           </View>
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Ionicons name="log-out-outline" size={24} color="white" />
@@ -45,7 +44,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // paddingTop: 50,
   },
   header: {
     flexDirection: "row",
@@ -69,52 +67,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#ff1e00",
     padding: 10,
     borderRadius: 15,
-  },
-  messagesContainer: {
-    flex: 1,
-    paddingHorizontal: 10,
-    marginTop: 10,
-  },
-  messageBubbleSent: {
-    alignSelf: "flex-end",
-    backgroundColor: "#3b5998",
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5,
-    maxWidth: "75%",
-  },
-  messageBubbleReceived: {
-    alignSelf: "flex-start",
-    backgroundColor: "#e6e6e6",
-    padding: 10,
-    borderRadius: 10,
-    marginVertical: 5,
-    maxWidth: "75%",
-  },
-  messageText: {
-    color: "white",
-    fontSize: 16,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  input: {
-    flex: 1,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    marginRight: 10,
-    fontSize: 16,
-  },
-  sendButton: {
-    backgroundColor: "#3b5998",
-    padding: 10,
-    borderRadius: 20,
   },
 });
