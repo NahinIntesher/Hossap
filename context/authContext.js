@@ -97,7 +97,7 @@ export const AuthContextProvider = ({ children }) => {
       await AsyncStorage.removeItem("isAuthenticated");
 
       // After logout, redirect to Login
-      router.push("/logIn");
+      router.replace("logIn");
     } catch (error) {
       console.log(error);
     }

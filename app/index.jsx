@@ -1,5 +1,5 @@
 import { Link, usePathname, useSegments } from "expo-router";
-import { Text, View, Image, TouchableOpacity } from "react-native";
+import { Text, View, Image, TouchableOpacity, Alert } from "react-native";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
@@ -24,9 +24,9 @@ export default function Onboarding() {
           if (typeof isAuthenticated === "undefined") return;
           const inApp = segments[0] === "(app)";
           if (isAuthenticated && !inApp) {
-            router.push("/home"); // Redirect to home if authenticated
+            router.replace("/home"); // Redirect to home if authenticated
           } else if (isAuthenticated === false) {
-            router.push("/logIn"); // Redirect to login if not authenticated
+            router.replace("/logIn"); // Redirect to login if not authenticated
           }
         } else {
           setIsFirstTime(true);
