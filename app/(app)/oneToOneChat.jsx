@@ -12,8 +12,11 @@ import React, { useState } from "react";
 import { useSearchParams } from "expo-router"; // Import useSearchParams for accessing params
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/context/authContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router"; // Import useRouter for navigation
 
 export default function oneToOneChat() {
+  const navigation = useRouter(); // Initialize navigation
   // const { userId, userName } = useSearchParams();
   const { user } = useAuth();
   const userId = "1"; // Replace with the actual user ID
@@ -74,45 +77,62 @@ export default function oneToOneChat() {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Chat with {userName}</Text>
-      </View>
-      <FlatList
-        data={messages}
-        renderItem={renderMessageItem}
-        keyExtractor={(item) => item.id}
-        style={styles.chatList}
-      />
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type a message..."
-          value={inputText}
-          onChangeText={setInputText}
+    <SafeAreaView style={styles.safeContainer}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        // behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.header}>
+          <Ionicons
+            name="arrow-back"
+            size={24}
+            color="white"
+            style={{ paddingRight: 70 }}
+            onPress={() => navigation.navigate("home")}
+          />
+          <Text style={styles.headerTitle}>Chat with {userName}</Text>
+        </View>
+        <FlatList
+          data={messages}
+          renderItem={renderMessageItem}
+          keyExtractor={(item) => item.id}
+          style={styles.chatList}
         />
-        <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-          <Ionicons name="send" size={24} color="white" />
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Type a message..."
+            value={inputText}
+            onChangeText={setInputText}
+          />
+          <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+            <Ionicons name="send" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: "#a023ff",
+  },
   container: {
     flex: 1,
-    // backgroundColor: "#f5f7fa",
+    backgroundColor: "#e9e9e9",
   },
   header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     padding: 15,
     backgroundColor: "#a023ff",
     alignItems: "center",
   },
   headerTitle: {
+    flex: 1,
     color: "white",
     fontSize: 20,
     fontWeight: "bold",

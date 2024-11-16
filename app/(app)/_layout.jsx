@@ -12,7 +12,14 @@ export default function _layout() {
           name="home"
           options={{
             headerShown: false,
-            contentStyle: { backgroundColor: "#a023ff" }, // Set background color for the screen
+            contentStyle: { backgroundColor: "#a023ff" },
+          }}
+        />
+        <Stack.Screen
+          name="oneToOneChat"
+          options={{
+            headerShown: false,
+            // contentStyle: { backgroundColor: "#a023ff" },
           }}
         />
       </Stack>

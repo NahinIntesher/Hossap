@@ -82,6 +82,8 @@ export const AuthContextProvider = ({ children }) => {
         msg = "Invalid Password";
       } else if (msg.includes("(auth/invalid-credential)")) {
         msg = "Invalid Email or Password";
+      } else if (msg.includes("(auth/network-request-failed)")) {
+        msg = "Network error. Please try again.";
       }
       return { success: false, message: msg };
     }
@@ -138,6 +140,8 @@ export const AuthContextProvider = ({ children }) => {
         msg = "Invalid Email or Password";
       } else if (msg.includes("(auth/email-already-in-use)")) {
         msg = "Email already exists";
+      } else if (msg.includes("(auth/network-request-failed)")) {
+        msg = "Network error. Please try again.";
       }
       return { success: false, message: msg };
     }
