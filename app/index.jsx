@@ -21,23 +21,26 @@ export default function Onboarding() {
         );
         if (hasSeenOnboarding) {
           setIsFirstTime(false);
-          if (typeof isAuthenticated === "undefined") return;
           const inApp = segments[0] === "(app)";
-          if (isAuthenticated && !inApp) {
-            router.replace("home"); // Redirect to home if authenticated
-          } else if (isAuthenticated === false) {
-            router.replace("logIn"); // Redirect to login if not authenticated
+          if (typeof isAuthenticated !== "undefined") {
+            if (isAuthenticated && !inApp) {
+              router.replace("home");
+            } else if (isAuthenticated === false) {
+              router.replace("logIn");
+            }
           }
         } else {
           setIsFirstTime(true);
-          setLoaded(true); // Render the onboarding screen
         }
       } catch (error) {
         console.error("Error checking onboarding status:", error);
+      } finally {
+        setLoaded(true); // Loading complete
       }
     };
+
     checkFirstTime();
-  }, []);
+  }, [isAuthenticated]);
 
   const handleContinue = async () => {
     try {
@@ -50,10 +53,16 @@ export default function Onboarding() {
   };
 
   if (isFirstTime === null) {
-    return null; // Optionally, a loading indicator can be placed here
+    // Show a loading state while determining the onboarding status
+    return (
+      <View className="flex-1 justify-center items-center">
+        <Text>Loading...</Text>
+      </View>
+    );
   }
 
-  if (isFirstTime && isLoaded) {
+  if (isFirstTime === true) {
+    // Show the onboarding screen
     return (
       <View className="flex-1 p-8 justify-center items-center">
         <Image
@@ -79,5 +88,5 @@ export default function Onboarding() {
     );
   }
 
-  return null; // Or a fallback/loading screen if necessary
+  return null; // If isFirstTime === false, the router will handle redirection
 }
