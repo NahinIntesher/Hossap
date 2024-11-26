@@ -1,157 +1,46 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Image,
-} from "react-native";
-import React from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { View, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useAuth } from "../../context/authContext";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useRouter } from "expo-router"; // Import useRouter for navigation
+import { useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import ChatList from "@/components/ChatList";
+import { heightPercentageToDP as hp } from "react-native-responsive-screen";
+import { query, where, getDocs } from "firebase/firestore";
+import { usersRef } from "../../firebaseConfig";
 
 export default function Home() {
-  const { logout, user } = useAuth();
-  const router = useRouter(); // Initialize router
+  const { user } = useAuth();
+  const [users, setUsers] = useState([]);
+  const router = useRouter();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      console.log("Logged out successfully");
-    } catch (error) {
-      console.error("Logout failed: ", error);
+  useEffect(() => {
+    if (user?.uid) {
+      getUsers();
     }
-  };
+  }, [user]);
 
-  const chatList = [
-    {
-      id: "1",
-      name: "John Doe",
-      message: "Hey, how are you?",
-      timestamp: "2:30 PM",
-      avatar: "https://example.com/avatar1.png",
-    },
-    {
-      id: "2",
-      name: "Jane Smith",
-      message: "Looking forward to our meeting!",
-      timestamp: "1:15 PM",
-      avatar: "https://example.com/avatar2.png",
-    },
-    {
-      id: "3",
-      name: "Alex Johnson",
-      message: "Can you send me the files?",
-      timestamp: "Yesterday",
-      avatar: "https://example.com/avatar3.png",
-    },
-  ];
+  const getUsers = async () => {
+    const q = query(usersRef, where("userId", "!=", user?.uid));
 
-  const handleChatPress = (chatUser) => {
-    router.push({
-      pathname: "/oneToOneChat",
-      params: { userId: chatUser.id, userName: chatUser.name },
+    const querySnapshot = await getDocs(q);
+    let data = [];
+    querySnapshot.forEach((doc) => {
+      data.push({ ...doc.data() });
     });
+    setUsers(data);
   };
-
-  const renderChatItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.chatItem}
-      onPress={() => handleChatPress(item)}
-    >
-      <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      <View style={styles.chatDetails}>
-        <Text style={styles.chatName}>{item.name}</Text>
-        <Text style={styles.chatMessage}>{item.message}</Text>
-      </View>
-      <Text style={styles.timestamp}>{item.timestamp}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <SafeAreaView style={styles.safeContainer}>
-      <LinearGradient colors={["#f5f7fa", "#c3cfe2"]} style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Chats</Text>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-            <Ionicons name="log-out-outline" size={20} color="white" />
-          </TouchableOpacity>
+    <View className="flex-1 bg-white">
+      <StatusBar style="light" />
+      {users.length > 0 ? (
+        <ChatList currentUser={user} users={users} />
+      ) : (
+        <View className="flex-1 justify-center items-center">
+          <FontAwesome5 name="users-slash" size={hp(10)} color="#728156" />
+          <Text className="text-xl mt-5 font-semibold">No user found</Text>
         </View>
-        <FlatList
-          data={chatList}
-          renderItem={renderChatItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.chatList}
-        />
-      </LinearGradient>
-    </SafeAreaView>
+      )}
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  safeContainer: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: "#a023ff",
-  },
-  headerTitle: {
-    color: "white",
-    fontSize: 25,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  logoutButton: {
-    backgroundColor: "#0165ad",
-    padding: 8,
-    borderRadius: 10,
-  },
-  chatList: {
-    padding: 10,
-  },
-  chatItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  chatDetails: {
-    flex: 1,
-  },
-  chatName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  chatMessage: {
-    fontSize: 14,
-    color: "#666",
-  },
-  timestamp: {
-    fontSize: 12,
-    color: "#999",
-  },
-});

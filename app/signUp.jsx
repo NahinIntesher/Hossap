@@ -6,11 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  ScrollView,
   Keyboard,
+  Platform,
 } from "react-native";
-import React, { useRef } from "react";
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -29,7 +30,6 @@ export default function SignUp() {
 
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const [loading, setLoading] = useState(false);
   // Add error states
   const [emailError, setEmailError] = useState("");
@@ -37,11 +37,6 @@ export default function SignUp() {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
-  };
-
-  const handleOutsidePress = () => {
-    setIsInputFocused(false);
-    Keyboard.dismiss();
   };
 
   // Email validation function
@@ -117,24 +112,26 @@ export default function SignUp() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <View className="flex-1">
-        <StatusBar style="auto" />
-        <View
-          style={{ paddingTop: hp(8), paddingHorizontal: wp(7) }}
-          className="flex-1"
-        >
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <StatusBar style="auto" />
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <StatusBar style="dark" />
+        <View style={{ paddingTop: hp(8), paddingHorizontal: wp(7) }}>
           {/* Signup Image */}
-          {!isInputFocused && (
-            <View className="items-center">
-              <Image
-                style={{ height: hp(20) }}
-                resizeMode="contain"
-                source={require("../assets/images/signupImage.png")}
-              />
-            </View>
-          )}
-          <View className="mb-2">
+          <View className="items-center">
+            <Image
+              style={{ height: hp(22) }}
+              resizeMode="contain"
+              source={require("../assets/images/signupImage.png")}
+            />
+          </View>
+          <View className="mb-5">
             <Text className="text-3xl text-center font-bold">
               Create Account
             </Text>
@@ -142,7 +139,7 @@ export default function SignUp() {
           </View>
 
           {/* Form Inputs */}
-          <View className="gap-2">
+          <View className="gap-1">
             {/* Name Input */}
             <View className="flex flex-col">
               <Text className="text-lg">Name</Text>
@@ -157,8 +154,6 @@ export default function SignUp() {
                   onChangeText={(value) => (nameRef.current = value)}
                   placeholder="Enter your name"
                   placeholderTextColor={"gray"}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
                 />
               </View>
             </View>
@@ -168,7 +163,7 @@ export default function SignUp() {
               <Text className="text-lg">Email</Text>
               <View
                 style={{ height: hp(7) }}
-                className={`flex-row gap-4 px-4 bg-neutral-100 items-center rounded-xl border "border-neutral-500`}
+                className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500"
               >
                 <Octicons name="mail" size={hp(2.7)} color="black" />
                 <TextInput
@@ -181,11 +176,9 @@ export default function SignUp() {
                   keyboardType="email-address"
                   placeholder="Enter your email"
                   placeholderTextColor={"gray"}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
                 />
               </View>
-              {isInputFocused && emailError && (
+              {emailError && (
                 <Text style={{ color: "#ff3d3d" }} className="text-xs mt-1">
                   {emailError}
                 </Text>
@@ -210,55 +203,69 @@ export default function SignUp() {
                   placeholder="••••••••••••••"
                   secureTextEntry={!showPassword}
                   placeholderTextColor={"gray"}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility}>
                   <Ionicons
-                    name={showPassword ? "eye-off" : "eye"}
+                    name={!showPassword ? "eye-off" : "eye"}
                     size={24}
                     color="#333"
                   />
                 </TouchableOpacity>
               </View>
-              {isInputFocused && passwordError && (
+              {passwordError && (
                 <Text style={{ color: "#ff3d3d" }} className="text-xs mt-1">
                   {passwordError}
                 </Text>
               )}
+            </View>
 
-              {/* Sign Up Button */}
-              <View className="flex flex-col items-center">
-                {loading ? (
-                  <Loading size={hp(8)} />
-                ) : (
-                  <TouchableOpacity
-                    className="w-full bg-[#a023ff] items-center mt-4 rounded-lg py-5"
-                    onPress={handleSignUp}
-                  >
-                    <Text className="text-white text-xl font-bold">
-                      Sign Up
-                    </Text>
-                  </TouchableOpacity>
-                )}
+            {/* Profile Image Input */}
+            <View className="flex flex-col">
+              <Text className="text-lg">Profile Image</Text>
+              <View
+                style={{ height: hp(7) }}
+                className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500"
+              >
+                <Octicons name="image" size={hp(2.7)} color="black" />
+                <TextInput
+                  style={{ fontSize: hp(2) }}
+                  className="flex-1 font-semibold text-neutral-700"
+                  onChangeText={(value) => (profileRef.current = value)}
+                  placeholder="Enter your profile image url"
+                  placeholderTextColor={"gray"}
+                />
               </View>
+            </View>
 
-              {/* Login Link */}
-              <View className="flex flex-row justify-center mt-4">
-                <Text className="text-md">Already have an account? </Text>
-                <Link href={"/logIn"}>
-                  <Text
-                    style={{ color: "#a023ff" }}
-                    className="text-md font-bold"
-                  >
-                    Login
-                  </Text>
-                </Link>
-              </View>
+            {/* Sign Up Button */}
+            <View className="flex flex-col items-center">
+              {loading ? (
+                <Loading size={hp(8)} />
+              ) : (
+                <TouchableOpacity
+                  className="w-full bg-[#728156] items-center mt-4 rounded-lg py-5"
+                  onPress={handleSignUp}
+                >
+                  <Text className="text-white text-xl font-bold">Sign Up</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Login Link */}
+            <View className="flex flex-row justify-center mt-4">
+              <Text className="text-md">Already have an account? </Text>
+              <Link href={"/logIn"}>
+                <Text
+                  style={{ color: "#728156" }}
+                  className="text-md font-bold"
+                >
+                  Login
+                </Text>
+              </Link>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

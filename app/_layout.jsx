@@ -4,6 +4,7 @@ import { Slot, useRouter, useSegments, usePathname } from "expo-router";
 import "../global.css";
 import { AuthContextProvider, useAuth } from "../context/authContext";
 import { BackHandler } from "react-native";
+import { Menu, MenuProvider } from "react-native-popup-menu";
 
 const MainLayout = () => {
   const { isAuthenticated } = useAuth();
@@ -29,8 +30,10 @@ const MainLayout = () => {
 
 export default function Layout() {
   return (
-    <AuthContextProvider>
-      <MainLayout />
-    </AuthContextProvider>
+    <MenuProvider>
+      <AuthContextProvider>
+        <MainLayout />
+      </AuthContextProvider>
+    </MenuProvider>
   );
 }

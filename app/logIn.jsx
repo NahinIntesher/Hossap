@@ -2,15 +2,13 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   TextInput,
   TouchableOpacity,
   Alert,
-  TouchableWithoutFeedback,
-  Keyboard,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
-import React, { useRef } from "react";
-import { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -28,7 +26,6 @@ export default function LogIn() {
   const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [isInputFocused, setIsInputFocused] = useState(false);
 
   // Add error states
   const [emailError, setEmailError] = useState("");
@@ -36,11 +33,6 @@ export default function LogIn() {
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
-  };
-
-  const handleOutsidePress = () => {
-    setIsInputFocused(false);
-    Keyboard.dismiss();
   };
 
   // Email validation function
@@ -124,24 +116,25 @@ export default function LogIn() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleOutsidePress}>
-      <View className="flex-1">
-        <StatusBar style="auto" />
-        <View
-          style={{ paddingTop: hp(8), paddingHorizontal: wp(7) }}
-          className="flex-1 gap-5"
-        >
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior="padding"
+      keyboardVerticalOffset={hp(10)}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <StatusBar style="dark" />
+        <View style={{ paddingTop: hp(8), paddingHorizontal: wp(7) }}>
           {/* Signin Image */}
-          {!isInputFocused && (
-            <View className="items-center">
-              <Image
-                style={{ height: hp(20) }}
-                resizeMode="contain"
-                source={require("../assets/images/loginImage.png")}
-              />
-            </View>
-          )}
-          <View className="mb-2">
+          <View className="items-center">
+            <Image
+              style={{ height: hp(22) }}
+              resizeMode="contain"
+              source={require("../assets/images/loginImage.png")}
+            />
+          </View>
+
+          {/* Header */}
+          <View className="mb-10">
             <Text className="text-3xl text-center font-bold">Welcome Back</Text>
             <Text className="text-md text-center">
               Enter your credentials to login
@@ -155,7 +148,7 @@ export default function LogIn() {
               <Text className="text-lg">Email</Text>
               <View
                 style={{ height: hp(7) }}
-                className={`flex-row gap-4 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500`}
+                className="flex-row gap-4 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500"
               >
                 <Octicons name="mail" size={hp(2.7)} color="black" />
                 <TextInput
@@ -168,11 +161,9 @@ export default function LogIn() {
                   keyboardType="email-address"
                   placeholder="Enter your email"
                   placeholderTextColor={"gray"}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
                 />
               </View>
-              {isInputFocused && emailError && (
+              {emailError && (
                 <Text style={{ color: "#ff3d3d" }} className="text-xs mt-1">
                   {emailError}
                 </Text>
@@ -184,7 +175,7 @@ export default function LogIn() {
               <Text className="text-lg">Password</Text>
               <View
                 style={{ height: hp(7) }}
-                className={`flex-row gap-2 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500`}
+                className="flex-row gap-2 px-4 bg-neutral-100 items-center rounded-xl border border-neutral-500"
               >
                 <Octicons name="lock" size={hp(2.7)} color="black" />
                 <TextInput
@@ -197,8 +188,6 @@ export default function LogIn() {
                   placeholder="••••••••••••••"
                   secureTextEntry={!showPassword}
                   placeholderTextColor={"gray"}
-                  onFocus={() => setIsInputFocused(true)}
-                  onBlur={() => setIsInputFocused(false)}
                 />
                 <TouchableOpacity onPress={togglePasswordVisibility}>
                   <Ionicons
@@ -208,42 +197,42 @@ export default function LogIn() {
                   />
                 </TouchableOpacity>
               </View>
-              {isInputFocused && passwordError && (
+              {passwordError && (
                 <Text style={{ color: "#ff3d3d" }} className="text-xs mt-1">
                   {passwordError}
                 </Text>
               )}
+            </View>
 
-              {/* Login Button */}
-              <View className="flex flex-col items-center">
-                {loading ? (
-                  <Loading size={hp(8)} />
-                ) : (
-                  <TouchableOpacity
-                    className="w-full bg-[#a023ff] items-center mt-4 rounded-lg py-5"
-                    onPress={handleLogin}
-                  >
-                    <Text className="text-white text-xl font-bold">Login</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+            {/* Login Button */}
+            <View className="flex flex-col items-center">
+              {loading ? (
+                <Loading size={hp(8)} />
+              ) : (
+                <TouchableOpacity
+                  className="w-full bg-[#728156] items-center mt-4 rounded-lg py-5"
+                  onPress={handleLogin}
+                >
+                  <Text className="text-white text-xl font-bold">Login</Text>
+                </TouchableOpacity>
+              )}
+            </View>
 
-              {/* Sign Up Link */}
-              <View className="flex flex-row justify-center mt-4">
-                <Text className="text-md">Don't have an account? </Text>
-                <Link href={"/signUp"}>
-                  <Text
-                    style={{ color: "#a023ff" }}
-                    className="text-md font-bold"
-                  >
-                    Sign Up
-                  </Text>
-                </Link>
-              </View>
+            {/* Sign Up Link */}
+            <View className="flex flex-row justify-center mt-4">
+              <Text className="text-md">Don't have an account? </Text>
+              <Link href={"/signUp"}>
+                <Text
+                  style={{ color: "#728156" }}
+                  className="text-md font-bold"
+                >
+                  Sign Up
+                </Text>
+              </Link>
             </View>
           </View>
         </View>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

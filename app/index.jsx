@@ -79,7 +79,7 @@ export default function Onboarding() {
           get started!
         </Text>
         <TouchableOpacity
-          className="bg-[#a023ff] py-4 px-8 rounded-full"
+          className="bg-[#728156] py-4 px-8 rounded-full"
           onPress={handleContinue}
         >
           <Text className="text-white text-lg font-bold">Get Started</Text>
