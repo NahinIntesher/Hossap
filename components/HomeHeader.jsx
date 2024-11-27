@@ -23,7 +23,7 @@ export default function HomeHeader() {
   const { top } = useSafeAreaInsets();
   const { logout, user } = useAuth();
   const handleProfile = () => {
-    router.replace({ pathname: "/userProfile" });
+    router.push("/userProfile");
   };
   const handleLogout = async () => {
     await logout();

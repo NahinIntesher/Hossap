@@ -71,7 +71,7 @@ export const AuthContextProvider = ({ children }) => {
       await AsyncStorage.setItem("isAuthenticated", "true");
 
       // After login, redirect to Home
-      router.push("/home");
+      router.replace("home");
 
       return { success: true, user: response?.user };
     } catch (error) {
